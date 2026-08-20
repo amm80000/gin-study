@@ -10,19 +10,12 @@ func main() {
 
 	router := gin.Default()
 
-	router.GET("/user/:name", func(c *gin.Context) {
+	router.GET("/welcome", func(c *gin.Context) {
 
-		name := c.Param("name")
-		c.String(http.StatusOK, "Hello %s", name)
-	})
+		firstname := c.DefaultQuery("first_name", "John")
+		lastname := c.Query("lastname")
 
-	router.GET("/user/:name/*action", func(c *gin.Context) {
-
-		name := c.Param("name")
-		action := c.Param("action")
-
-		c.String(http.StatusOK, "Hello %s %s", name, action)
-
+		c.String(http.StatusOK, "Hello %s %s", firstname, lastname)
 	})
 
 	err := router.Run()
