@@ -10,12 +10,17 @@ func main() {
 
 	router := gin.Default()
 
-	router.GET("/welcome", func(c *gin.Context) {
+	router.POST("/form_post", func(c *gin.Context) {
 
-		firstname := c.DefaultQuery("first_name", "John")
-		lastname := c.Query("lastname")
+		message := c.PostForm("message")
+		nick := c.DefaultPostForm("nick", "anonymous")
 
-		c.String(http.StatusOK, "Hello %s %s", firstname, lastname)
+		c.JSON(http.StatusOK, gin.H{
+			"status":  "posted",
+			"message": message,
+			"nick":    nick,
+		})
+
 	})
 
 	err := router.Run()
