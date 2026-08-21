@@ -17,19 +17,25 @@ func main() {
 
 	router.POST("/upload", func(c *gin.Context) {
 
-		file, err := c.FormFile("file")
+		form, err := c.MultipartForm()
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		log.Println(file.Filename)
+		files := form.File["files"]
 
-		dst := filepath.Join("./file", filepath.Base(file.Filename))
-		c.SaveUploadedFile(file, dst)
+		for _, file := range files {
 
-		c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
+			log.Println(file.Filename)
+
+			dst := filepath.Join("./files/", filepath.Base(file.Filename))
+
+			c.SaveUploadedFile(file, dst)
+
+			c.String(http.StatusOK, fmt.Sprintf("'%s' files uploaded!", file.Filename))
+		}
 	})
 
 	err := router.Run()
