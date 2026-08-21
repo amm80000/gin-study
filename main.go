@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,16 +11,15 @@ func main() {
 
 	router := gin.Default()
 
-	router.POST("/form_post", func(c *gin.Context) {
+	router.POST("/post", func(c *gin.Context) {
 
+		id := c.Query("id")
+		page := c.DefaultQuery("page", "0")
+		name := c.PostForm("name")
 		message := c.PostForm("message")
-		nick := c.DefaultPostForm("nick", "anonymous")
 
-		c.JSON(http.StatusOK, gin.H{
-			"status":  "posted",
-			"message": message,
-			"nick":    nick,
-		})
+		fmt.Printf("id: %s, page: %s, name: %s, message: %s\n", id, page, name, message)
+		c.String(http.StatusOK, "id: %s, page: %s, name: %s, message: %s", id, page, name, message)
 
 	})
 
