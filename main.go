@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,16 +13,23 @@ func main() {
 
 	router := gin.Default()
 
-	router.POST("/post", func(c *gin.Context) {
+	router.MaxMultipartMemory = 8 << 20
 
-		id := c.Query("id")
-		page := c.DefaultQuery("page", "0")
-		name := c.PostForm("name")
-		message := c.PostForm("message")
+	router.POST("/upload", func(c *gin.Context) {
 
-		fmt.Printf("id: %s, page: %s, name: %s, message: %s\n", id, page, name, message)
-		c.String(http.StatusOK, "id: %s, page: %s, name: %s, message: %s", id, page, name, message)
+		file, err := c.FormFile("file")
 
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		log.Println(file.Filename)
+
+		dst := filepath.Join("./file", filepath.Base(file.Filename))
+		c.SaveUploadedFile(file, dst)
+
+		c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
 	})
 
 	err := router.Run()
