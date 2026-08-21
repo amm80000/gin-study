@@ -6,44 +6,32 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func loginEndpoint(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"action": "login",
-	})
-}
-
-func submitEndpoint(c *gin.Context) {
-
-	c.JSON(http.StatusOK, gin.H{
-		"action": "submit",
-	})
-}
-
-func readEndpoint(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"action": "read",
-	})
-}
-
 func main() {
 
 	router := gin.Default()
 
-	// Simple group: v1
-	{
-		v1 := router.Group("/v1")
-		v1.POST("/login", loginEndpoint)
-		v1.POST("/submit", submitEndpoint)
-		v1.POST("/read", readEndpoint)
-	}
+	router.GET("/old", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "http://www.google.com")
+	})
 
-	// Simple group: v2
-	{
-		v2 := router.Group("/v2")
-		v2.POST("/login", loginEndpoint)
-		v2.POST("/submit", submitEndpoint)
-		v2.POST("/read", readEndpoint)
-	}
+	router.POST("/submit", func(c *gin.Context) {
+		c.Redirect(http.StatusFound, "/result")
+	})
+
+	router.GET("/test", func(c *gin.Context) {
+		c.Request.URL.Path = "/final"
+		router.HandleContext(c)
+	})
+
+	router.GET("/final", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"hello": "world",
+		})
+	})
+
+	router.GET("/result", func(c *gin.Context) {
+		c.String(http.StatusOK, "Redirected here!")
+	})
 
 	err := router.Run()
 	if err != nil {
